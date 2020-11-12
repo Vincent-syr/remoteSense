@@ -1,0 +1,12 @@
+.ipynb_checkpoints/
+.vscode/
+__pycache__/
+.idea/
+features/
+checkpoints/
+backup/
+runs/
+*.jpg
+*.tar
+# !best_model.tar
+# !399.tar
