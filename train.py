@@ -198,4 +198,18 @@ if __name__ == "__main__":
     stop_epoch = params.stop_epoch
     max_acc = 0
 
+
+    if params.start_epoch != 0:
+        # resume_file = get_resume_file(params.checkpoint_dir)
+        resume_file = os.path.join(params.model_dir, str(params.start_epoch) +'.tar')
+        if resume_file is not None:
+            tmp = torch.load(resume_file)
+            start_epoch = tmp['epoch']+1
+            if 'max_acc' in tmp:
+                max_acc = tmp['max_acc']
+            model.load_state_dict(tmp['state'])
+            print('resume training from ', params.start_epoch)
+        else:
+            raise ValueError("no such resume file")
+
     train(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)

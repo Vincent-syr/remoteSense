@@ -148,23 +148,6 @@ def save_fig(trlog_path):
         plt.savefig('%s_acc.jpg' % trlog_path)
 
         plt.figure()
-        img_ratio = trlog['img_ratio']
-        lambda_c = trlog['lambda_c']
-        x = range(len(img_ratio))
-        plt.plot(x, img_ratio, linewidth = 1.0, label='img_ratio')
-        plt.plot(x, lambda_c, linewidth = 1.0, label='lambda')
-        plt.title('Image Ratio')
-        plt.xlabel('epoch')
-        plt.ylabel('Percentage')
-        plt.legend()
-
-        
-        plt.grid()
-        plt.savefig('%s_img_ratio.jpg' % trlog_path)
-
-
-
-        plt.figure()
         lr = trlog['lr']
         x = list(range(len(lr)))
         l1, = plt.plot(x, lr, linewidth = 1.0)
