@@ -166,12 +166,6 @@ if __name__ == "__main__":
 
     base_datamgr            = SetDataManager(image_size, n_episode=params.n_episode, **train_few_shot_params)
     base_loader             = base_datamgr.get_data_loader( base_file , aug = params.train_aug )
-        
-    # transform = self.trans_loader.get_composed_transform(params.aug)
-    # dataset = SimpleDataset(data_file, transform)
-    # sampler = EpisodicSampler(dataset.label, self.n_way, self.batch_size, self.n_episode)
-
-
 
     test_few_shot_params     = dict(n_way = params.test_n_way, n_support = params.n_shot, n_query = params.n_query) 
     val_datamgr             = SetDataManager(image_size, n_episode=params.n_episode , **test_few_shot_params)
