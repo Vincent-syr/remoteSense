@@ -1,0 +1,1 @@
+Use few shot learning algorithm to solve problem in Remote Sense Scene Classification
