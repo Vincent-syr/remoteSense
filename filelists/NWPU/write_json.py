@@ -6,10 +6,10 @@ import json
 import random
 
 
-
-data_path = 'f:/shengyunrui/NWPU_Dataset/NWPU-RESISC45'
+data_path = '/test/0Dataset_others/Dataset/RemoteSense/NWPU-RESISC45/NWPU-RESISC45'
+# data_path = 'f:/shengyunrui/NWPU_Dataset/NWPU-RESISC45'
 savedir = './'
-dataset_list = ['base','val','novel']
+dataset_list = ['base_linux','val_linux','novel_linux']
 # dataset_list = ['val']
 
 folder_list = [f for f in listdir(data_path) if isdir(join(data_path, f))]
@@ -20,7 +20,7 @@ classfile_list_all = []
 
 for i, folder in enumerate(folder_list):
     folder_path = join(data_path, folder)
-    classfile_list_all.append( [ join(folder_path, cf) for cf in listdir(folder_path) if (isfile(join(folder_path,cf)) and cf[0] != '.')])
+    classfile_list_all.append( [ join(folder_path, cf) for cf in listdir(folder_path) if (isfile(join(folder_path,cf)) and cf[0] != '.' and cf!='Thumbs.db')])
     random.shuffle(classfile_list_all[i])
 
 for dataset in dataset_list:

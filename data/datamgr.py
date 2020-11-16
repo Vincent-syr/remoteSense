@@ -49,22 +49,25 @@ class DataManager:
 
 
 class SetDataManager(DataManager):
-    def __init__(self, image_size, n_way, n_support, n_query, aux=False,  n_episode =100):
+    def __init__(self, image_size, n_way, n_support, n_query, params, aux=False,  n_episode =100):
         super(SetDataManager, self).__init__()
         self.image_size = image_size
         self.n_way = n_way
         self.batch_size = n_support + n_query
         self.n_episode = n_episode
         self.trans_loader = TransformLoader(image_size)
+        self.params = params
 
     def get_data_loader(self, data_file, aug): #parameters that would change on train/val set
         transform = self.trans_loader.get_composed_transform(aug)
         dataset = SimpleDataset(data_file, transform)
         sampler = EpisodicSampler(dataset.label, self.n_way, self.batch_size, self.n_episode)
-
         # data_loader_params = dict(batch_sampler = sampler,  num_workers = 12, pin_memory = True)       
         # data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
-        data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_sampler=sampler, num_workers=0, pin_memory=True)
-        # data_loader = torch.utils.data.DataLoader(dataset=dataset, num_workers=1, pin_memory=True)
+        if self.params.os == 'linux':
+            print('os = linux')
+            data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_sampler=sampler, num_workers=12, pin_memory=True)
+        else:
+            data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_sampler=sampler, num_workers=0, pin_memory=True)
 
         return data_loader

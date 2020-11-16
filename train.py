@@ -162,7 +162,7 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
         # optimizer = torch.optim.SGD(model.parameters(), lr=init_lr, momentum=0.9, weight_decay=0.001)
        optimizer = torch.optim.SGD([
                 {'params': model.parameters()},
-                {'params': rotate_classifier.parameters()}], lr=init_lr, momentum=0.9, weight_decay=0.001)
+                {'params': rotate_classifier.parameters()}], lr=init_lr, momentum=0.9, weight_decay=params.wd)
 
     elif params.optim == 'Adam':
         optimizer = torch.optim.Adam([
@@ -356,8 +356,13 @@ if __name__ == "__main__":
     np.random.seed(10)
     params = parse_args('train')
     print(params)    
-    base_file = os.path.join('./filelists', params.dataset, 'base.json')
-    val_file = os.path.join('./filelists', params.dataset, 'val.json')
+
+    if params.os == 'linux':
+        base_file = os.path.join('./filelists', params.dataset, 'base_linux.json')
+        val_file = os.path.join('./filelists', params.dataset, 'val_linux.json')
+    else:
+        base_file = os.path.join('./filelists', params.dataset, 'base.json')
+        val_file = os.path.join('./filelists', params.dataset, 'val.json')
     # novel_file = os.path.join('./filelists', params.dataset, 'novel.json')
 
     image_size = 224
@@ -365,11 +370,11 @@ if __name__ == "__main__":
     print("n_query = ", params.n_query)
 
     train_few_shot_params   = dict(n_way = params.train_n_way, n_support = params.n_shot, n_query=params.n_query) 
-    base_datamgr            = SetDataManager(image_size, n_episode=params.n_episode, **train_few_shot_params)
+    base_datamgr            = SetDataManager(image_size, n_episode=params.n_episode, params=params, **train_few_shot_params)
     base_loader             = base_datamgr.get_data_loader( base_file , aug = params.train_aug )
 
     test_few_shot_params     = dict(n_way = params.test_n_way, n_support = params.n_shot, n_query = params.n_query) 
-    val_datamgr             = SetDataManager(image_size, n_episode=params.n_episode , **test_few_shot_params)
+    val_datamgr             = SetDataManager(image_size, n_episode=params.n_episode, params=params, **test_few_shot_params)
     val_loader              = val_datamgr.get_data_loader(val_file, aug = False) 
 
     # novel_datamgr             = SetDataManager(image_size, n_episode=params.n_episode , **test_few_shot_params)

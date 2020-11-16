@@ -7,10 +7,12 @@ import random
 
 # cwd = os.getcwd() 
 # data_path = join(cwd,'CUB_200_2011/images')
-# data_path = '/test/0Dataset_others/Dataset/Caltech-UCSD-Birds-200-2011/CUB_200_2011/images'
-data_path = 'f:/shengyunrui/CUB_200_2011/CUB_200_2011/images'
+data_path = '/test/0Dataset_others/Dataset/Caltech-UCSD-Birds-200-2011/CUB_200_2011/images'
+# data_path = 'f:/shengyunrui/CUB_200_2011/CUB_200_2011/images'
 savedir = './'
-dataset_list = ['base','val','novel']
+# dataset_list = ['base','val','novel']
+dataset_list = ['base_linux','val_linux','novel_linux']
+
 # dataset_list = ['val']
 
 #if not os.path.exists(savedir):
@@ -24,7 +26,7 @@ classfile_list_all = []
 
 for i, folder in enumerate(folder_list):
     folder_path = join(data_path, folder)
-    classfile_list_all.append( [ join(folder_path, cf) for cf in listdir(folder_path) if (isfile(join(folder_path,cf)) and cf[0] != '.')])
+    classfile_list_all.append( [ join(folder_path, cf) for cf in listdir(folder_path) if (isfile(join(folder_path,cf)) and cf[0] != '.' and cf!='Thumbs.db')])
     random.shuffle(classfile_list_all[i])
 
 

@@ -44,17 +44,30 @@ class ProtoNetMulti(nn.Module):
 
     # def correct(self, x, is_feature=False):
     def correct(self, scores):
-        # scores: (n_way * 4 query,  n_way)
-
+        # scores.shape: (n_way * 4 query,  n_way)
         if self.params.method == 'rotate' and self.training:
             y_query = np.repeat(range(self.n_way ), 4 * self.n_query)
         else:
             y_query = np.repeat(range(self.n_way ), self.n_query)
 
-        topk_scores, topk_labels = scores.data.topk(1, 1, True, True)
-        topk_ind = topk_labels.cpu().numpy()
-        top1_correct = np.sum(topk_ind[:,0] == y_query)
-        return float(top1_correct), len(y_query)
+        y_query = torch.from_numpy(y_query)
+        y_query = Variable(y_query.long().cuda())
+
+        pred = torch.argmax(scores, dim=1)
+        correct = ((pred==y_query).sum()).item()
+        count = scores.shape[0]
+        return correct, count
+
+
+        # if self.params.method == 'rotate' and self.training:
+        #     y_query = np.repeat(range(self.n_way ), 4 * self.n_query)
+        # else:
+        #     y_query = np.repeat(range(self.n_way ), self.n_query)
+
+        # topk_scores, topk_labels = scores.data.topk(1, 1, True, True)
+        # topk_ind = topk_labels.cpu().numpy()
+        # top1_correct = np.sum(topk_ind[:,0] == y_query)
+        # return float(top1_correct), len(y_query)
 
 
     # def correct(self, z_all, lambda_c, attr_proj):
