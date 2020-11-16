@@ -3,10 +3,10 @@
 __pycache__/
 .idea/
 features/
-checkpoints/
+# checkpoints/
 backup/
 runs/
-*.jpg
+# *.jpg
 *.tar
 # !best_model.tar
 # !399.tar

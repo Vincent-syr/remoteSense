@@ -19,7 +19,7 @@ class ProtoNet(nn.Module):
         self.feature = model_func()
         # print(self.feature)
         self.feat_dim   = self.feature.final_feat_dim
-        self.loss_cls = nn.CrossEntropyLoss()
+        self.loss_fn = nn.CrossEntropyLoss()
 
 
     def forward(self, x):

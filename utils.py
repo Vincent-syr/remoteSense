@@ -27,8 +27,8 @@ def one_hot(y, num_class):
 
 
 def euclidean_dist(x, y):
-    # x: N x D, query
-    # y: M x D, proto
+    # x: N x D, query, N = n_way * n_query
+    # y: M x D, proto, M = n_way
     n = x.size(0)
     m = y.size(0)
     d = x.size(1)
@@ -39,7 +39,7 @@ def euclidean_dist(x, y):
     x = x.unsqueeze(1).expand(n, m, d)
     y = y.unsqueeze(0).expand(n, m, d)
 
-    return torch.pow(x - y, 2).sum(2)
+    return torch.pow(x - y, 2).sum(2)     # (n, m)
 
 
 
