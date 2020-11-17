@@ -257,44 +257,48 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
             racc_all = []
             for i, (x, _) in enumerate(base_loader, 1):
                 # shape(n_way*(n_shot+query), 3, 224,224)
-                bs = x.size(0)   # n_way * (k_shot+query)
-                x_ = []
-                a_ = []
-                for j in range(bs):
-                    x90 = x[j].transpose(2,1).flip(1)
-                    x180 = x90.transpose(2,1).flip(1)
-                    x270 =  x180.transpose(2,1).flip(1)
-                    x_ += [x[j], x90, x180, x270]
-                    a_ += [torch.tensor(0),torch.tensor(1),torch.tensor(2),torch.tensor(3)]
+                # bs = x.size(0)   # n_way * (k_shot+query)
+                # x_ = []
+                # a_ = []
+                # for j in range(bs):
+                #     x90 = x[j].transpose(2,1).flip(1)
+                #     x180 = x90.transpose(2,1).flip(1)
+                #     x270 =  x180.transpose(2,1).flip(1)
+                #     x_ += [x[j], x90, x180, x270]
+                #     a_ += [torch.tensor(0),torch.tensor(1),torch.tensor(2),torch.tensor(3)]
 
-                x_ = Variable(torch.stack(x_,0)).cuda()
-                a_ = Variable(torch.stack(a_,0)).cuda()
+                # x_ = Variable(torch.stack(x_,0)).cuda()
+                # a_ = Variable(torch.stack(a_,0)).cuda()
 
-                z = model.forward(x_)
+                x = x.cuda()
+                z = model.forward(x)
                 scores = model.compute_score(z)
                 correct_this, count_this = model.correct(scores)
 
-                rotate_scores =  rotate_classifier(z)   
-                rcorrect_this, rcount_this = compute_acc(rotate_scores, a_)
+                # rotate_scores =  rotate_classifier(z)   
+                # rcorrect_this, rcount_this = compute_acc(rotate_scores, a_)
 
                 cacc_all.append(correct_this/ float(count_this)*100)
-                racc_all.append(rcorrect_this/ float(rcount_this)*100)
+                # racc_all.append(rcorrect_this/ float(rcount_this)*100)
 
             # classfify accuracy
             cacc_all  = np.array(cacc_all)
             cacc_mean = np.mean(cacc_all)
             cacc_std  = np.std(cacc_all)
 
-            # rotate accuracy
-            racc_all.append(rcorrect_this / float(rcount_this)*100)
-            racc_mean = np.array(racc_all).mean()
-            racc_std = np.std(racc_all)
+            # # rotate accuracy
+            # racc_all.append(rcorrect_this / float(rcount_this)*100)
+            # racc_mean = np.array(racc_all).mean()
+            # racc_std = np.std(racc_all)
 
-            print('%d Test Acc = %4.2f%% +- %4.2f%%, Rotate Acc = %4.2f' %(
-                iter_num,  cacc_mean, 1.96* cacc_std/np.sqrt(iter_num), racc_mean))
+            print('%d Test Acc = %4.2f%% +- %4.2f%%' %(
+                iter_num,  cacc_mean, 1.96* cacc_std/np.sqrt(iter_num)))
+
+            # print('%d Test Acc = %4.2f%% +- %4.2f%%, Rotate Acc = %4.2f' %(
+            #     iter_num,  cacc_mean, 1.96* cacc_std/np.sqrt(iter_num), racc_mean))
 
             trlog['val_acc'].append(cacc_mean)
-            trlog['val_racc'].append(racc_mean)
+            # trlog['val_racc'].append(racc_mean)
 
         trlog['lr'].append(optimizer.param_groups[0]['lr'])
         print('epoch: ', epoch, 'lr: ', optimizer.param_groups[0]['lr'])
@@ -318,6 +322,8 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
         print('best epoch = %d, best val acc = %.2f%%' % (int(trlog['max_acc_epoch']), trlog['max_acc']))
         # cumulative cost time / total time predicted
         print('ETA:{}/{}'.format(timer.measure(), timer.measure((epoch+1-start_epoch) / float(stop_epoch-start_epoch))))
+
+
 
 # def test(novel_loader, model, params):
 #     model.eval()

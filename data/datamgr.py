@@ -65,7 +65,7 @@ class SetDataManager(DataManager):
         # data_loader_params = dict(batch_sampler = sampler,  num_workers = 12, pin_memory = True)       
         # data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
         if self.params.os == 'linux':
-            print('os = linux')
+            # print('os = linux')
             data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_sampler=sampler, num_workers=12, pin_memory=True)
         else:
             data_loader = torch.utils.data.DataLoader(dataset=dataset, batch_sampler=sampler, num_workers=0, pin_memory=True)
