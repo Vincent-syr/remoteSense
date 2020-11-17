@@ -363,12 +363,12 @@ if __name__ == "__main__":
     params = parse_args('train')
     print(params)    
 
-    if params.os == 'linux':
-        base_file = os.path.join('./filelists', params.dataset, 'base_linux.json')
-        val_file = os.path.join('./filelists', params.dataset, 'val_linux.json')
-    else:
-        base_file = os.path.join('./filelists', params.dataset, 'base.json')
-        val_file = os.path.join('./filelists', params.dataset, 'val.json')
+    # if params.os == 'linux':
+    #     base_file = os.path.join('./filelists', params.dataset, 'base_linux.json')
+    #     val_file = os.path.join('./filelists', params.dataset, 'val_linux.json')
+    # else:
+    base_file = os.path.join('./filelists', params.dataset, 'base.json')
+    val_file = os.path.join('./filelists', params.dataset, 'val.json')
     # novel_file = os.path.join('./filelists', params.dataset, 'novel.json')
 
     image_size = 224

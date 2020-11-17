@@ -1,0 +1,6 @@
+Time: 20201117-171547, Setting: CUB-base-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 79.62% +- 0.65% 
+Time: 20201117-171600, Setting: CUB-val-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 67.48% +- 0.74% 
+Time: 20201117-171614, Setting: CUB-novel-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 69.34% +- 0.77% 
+Time: 20201117-171643, Setting: CUB-base-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 94.21% +- 0.56% 
+Time: 20201117-171656, Setting: CUB-val-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 84.13% +- 0.71% 
+Time: 20201117-171710, Setting: CUB-novel-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 84.97% +- 0.74% 
