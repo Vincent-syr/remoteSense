@@ -154,7 +154,7 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
         os.makedirs(trlog_dir)
     trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
     
-    rotate_classifier = nn.Sequential( nn.Linear(model.feat_dim, 4)) 
+    rotate_classifier = nn.Sequential(nn.Linear(model.feat_dim, 4)) 
     rotate_classifier.cuda()
 
     init_lr = params.init_lr
@@ -325,37 +325,184 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
 
 
 
-# def test(novel_loader, model, params):
-#     model.eval()
-#     with torch.no_grad():
-#         acc_all = []
+def train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
+    trlog = get_trlog(params)
+    trlog['max_acc'] = max_acc
+    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
+    if not os.path.isdir(trlog_dir):
+        os.makedirs(trlog_dir)
+    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
+    
+    rotate_classifier = nn.Sequential(nn.Linear(model.module.feat_dim, 4)) 
+    rotate_classifier.cuda()
 
-#         for i in range(params.test_iter):
-#             for x,_ in novel_loader:
-#                 x = x.cuda()
-#                 z = model.forward(x)
-#                 scores = model.compute_score(z)
-#                 correct_this, count_this = model.correct(scores)
-#                 acc_all.append(correct_this/ float(count_this)*100)
+    init_lr = params.init_lr
+    if params.optim == 'SGD':
+        # optimizer = torch.optim.SGD(model.parameters(), lr=init_lr, momentum=0.9, weight_decay=0.001)
+       optimizer = torch.optim.SGD([
+                {'params': model.parameters()},
+                {'params': rotate_classifier.parameters()}], lr=init_lr, momentum=0.9, weight_decay=params.wd)
+
+    elif params.optim == 'Adam':
+        optimizer = torch.optim.Adam([
+                {'params': model.parameters()},
+                {'params': rotate_classifier.parameters()}
+        ], lr=init_lr)
+            
+    else:
+        raise ValueError('Unknown Optimizer !!')
+
+    timer = Timer()
+    print_freq = 50
+    lossfn = nn.CrossEntropyLoss()
+
+    for epoch in range(start_epoch, stop_epoch):
+        adjust_learning_rate(params, optimizer, epoch, init_lr)
+        model.train()
+        start = time.time()
+        cum_closs = 0
+        cum_rloss = 0
+        cacc_all = []
+        racc_all = []
+        iter_num = len(base_loader)
+
+        for i, (x, _) in enumerate(base_loader, 1):
+            # shape(n_way*(n_shot+query), 3, 224,224)
+            bs = x.size(0)   # n_way * (k_shot+query)
+            x_ = []
+            a_ = []
+            for j in range(bs):
+                x90 = x[j].transpose(2,1).flip(1)
+                x180 = x90.transpose(2,1).flip(1)
+                x270 =  x180.transpose(2,1).flip(1)
+                x_ += [x[j], x90, x180, x270]
+                a_ += [torch.tensor(0),torch.tensor(1),torch.tensor(2),torch.tensor(3)]
+
+            x_ = Variable(torch.stack(x_,0)).cuda()
+            # y_ = Variable(torch.stack(y_,0))
+            a_ = Variable(torch.stack(a_,0)).cuda()
+            # forward
+            z = model.forward(x_)
+            scores = model.module.compute_score(z)
+            correct_this, count_this = model.module.correct(scores)
+            
+            rotate_scores =  rotate_classifier(z)   
+            rcorrect_this, rcount_this = compute_acc(rotate_scores, a_)
+
+            y_query = torch.from_numpy(np.repeat(range(model.module.n_way), 4*model.module.n_query))
+            y_query = Variable(y_query.long().cuda())
+
+            rloss = lossfn(rotate_scores, a_)
+            closs = model.module.loss_fn(scores, y_query)
+
+            loss = 0.5*closs + 0.5*rloss
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+            cum_closs += closs.item()
+            cum_rloss += rloss.item()
+            avg_closs = cum_closs / float(i)
+            avg_rloss = cum_rloss / float(i)
+
+            # classfify accuracy
+            cacc_all.append(correct_this/ float(count_this)*100)
+            cacc_mean = np.array(cacc_all).mean()
+            cacc_std = np.std(cacc_all)
+
+            # rotate accuracy
+            racc_all.append(rcorrect_this / float(rcount_this)*100)
+            racc_mean = np.array(racc_all).mean()
+            racc_std = np.std(racc_all)
+
+            if i % print_freq==0:
+                print('Epoch {:d} | Batch {:d}/{:d} | Class Loss {:.3f} | Rotate Loss {:.3f}'.format(epoch, i, len(base_loader), avg_closs, avg_rloss))
+                print('                     Class Acc  {:.3f} | Rotate Acc  {:.3f}'.format(cacc_mean, racc_mean))
+
+        print('Train Acc = %4.2f%% +- %4.2f%%' %(cacc_mean, 1.96* cacc_std/np.sqrt(iter_num)))
+        trlog['train_loss'].append(avg_closs)
+        trlog['train_acc'].append(cacc_mean)
+
+        trlog['train_rloss'].append(avg_rloss)
+        trlog['train_racc'].append(racc_mean)
+        trlog['epoch'].append(epoch)
+
+        # evaluate
+        model.eval()
+        rotate_classifier.eval()
+        iter_num = len(val_loader)
+        with torch.no_grad():
+            cacc_all = []
+            racc_all = []
+            for i, (x, _) in enumerate(base_loader, 1):
+                # shape(n_way*(n_shot+query), 3, 224,224)
+                # bs = x.size(0)   # n_way * (k_shot+query)
+                # x_ = []
+                # a_ = []
+                # for j in range(bs):
+                #     x90 = x[j].transpose(2,1).flip(1)
+                #     x180 = x90.transpose(2,1).flip(1)
+                #     x270 =  x180.transpose(2,1).flip(1)
+                #     x_ += [x[j], x90, x180, x270]
+                #     a_ += [torch.tensor(0),torch.tensor(1),torch.tensor(2),torch.tensor(3)]
+
+                # x_ = Variable(torch.stack(x_,0)).cuda()
+                # a_ = Variable(torch.stack(a_,0)).cuda()
+
+                x = x.cuda()
+                z = model.forward(x)
+                scores = model.module.compute_score(z)
+                correct_this, count_this = model.module.correct(scores)
+
+                # rotate_scores =  rotate_classifier(z)   
+                # rcorrect_this, rcount_this = compute_acc(rotate_scores, a_)
+
+                cacc_all.append(correct_this/ float(count_this)*100)
+                # racc_all.append(rcorrect_this/ float(rcount_this)*100)
+
+            # classfify accuracy
+            cacc_all  = np.array(cacc_all)
+            cacc_mean = np.mean(cacc_all)
+            cacc_std  = np.std(cacc_all)
+
+            # # rotate accuracy
+            # racc_all.append(rcorrect_this / float(rcount_this)*100)
+            # racc_mean = np.array(racc_all).mean()
+            # racc_std = np.std(racc_all)
+
+            print('%d Test Acc = %4.2f%% +- %4.2f%%' %(
+                iter_num,  cacc_mean, 1.96* cacc_std/np.sqrt(iter_num)))
+
+            # print('%d Test Acc = %4.2f%% +- %4.2f%%, Rotate Acc = %4.2f' %(
+            #     iter_num,  cacc_mean, 1.96* cacc_std/np.sqrt(iter_num), racc_mean))
+
+            trlog['val_acc'].append(cacc_mean)
+            # trlog['val_racc'].append(racc_mean)
+
+        trlog['lr'].append(optimizer.param_groups[0]['lr'])
+        print('epoch: ', epoch, 'lr: ', optimizer.param_groups[0]['lr'])
+
+        if cacc_mean > trlog['max_acc'] : #for baseline and baseline++, we don't use validation in default and we let acc = -1, but we allow options to validate with DB index
+            trlog['max_acc_epoch'] = epoch
+            trlog['max_acc']  = cacc_mean
+
+            print("best model! save...")
+            outfile = os.path.join(params.model_dir, 'best_model.tar')
+            torch.save({'epoch':epoch, 'state':model.state_dict(), 'max_acc':trlog['max_acc']}, outfile)
+
+        # save model and trlog regularly
+        if (epoch % params.save_freq==0) or (epoch==stop_epoch-1):
+            outfile = os.path.join(params.model_dir, '{:d}.tar'.format(epoch))
+            torch.save({'epoch':epoch, 'state':model.state_dict(), 'max_acc': trlog['max_acc']}, outfile)
+            torch.save(trlog, trlog_path)
+
+        torch.cuda.empty_cache()  
+        # best epoch and val acc
+        print('best epoch = %d, best val acc = %.2f%%' % (int(trlog['max_acc_epoch']), trlog['max_acc']))
+        # cumulative cost time / total time predicted
+        print('ETA:{}/{}'.format(timer.measure(), timer.measure((epoch+1-start_epoch) / float(stop_epoch-start_epoch))))
 
 
-#     acc_all  = np.array(acc_all)
-#     acc_mean = np.mean(acc_all)
-#     acc_std  = np.std(acc_all)
-#     split = 'novel'
-#     print('%d %s Acc = %4.2f%% +- %4.2f%%' % (params.iter_num, split, acc_mean, 1.96 * acc_std / np.sqrt(params.iter_num)))
-
-#     record_file = os.path.join(params.record_dir, 'results.txt')
-#     with open(record_file , 'a') as f:
-#         timestamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
-#         aug_str = '-aug' if params.train_aug else ''
-#         aug_str += '-adapted' if params.adaptation else ''
-#         if params.method in ['baseline', 'baseline++'] :
-#             exp_setting = '%s-%s-%s-%s-%s%s %sshot %sway_test' %(params.dataset, params.source, split, params.model, params.method, aug_str, params.n_shot, params.test_n_way )
-#         else:
-#             exp_setting = '%s-%s-%s-%s%s %sshot %sway_train %sway_test' %(params.dataset, split, params.model, params.method, aug_str , params.n_shot , params.train_n_way, params.test_n_way )
-#         acc_str = '%d Test Acc = %4.2f%% +- %4.2f%%' %(params.iter_num, acc_mean, 1.96* acc_std/np.sqrt(params.iter_num*len(novel_loader)))
-#         f.write( 'Time: %s, Setting: %s, Acc: %s \n' %(timestamp,exp_setting,acc_str)  )
 
 
 if __name__ == "__main__":
@@ -422,7 +569,16 @@ if __name__ == "__main__":
         else:
             raise ValueError("no such resume file")
 
+
+
     if params.method == 'rotate':
+        # if torch.cuda.device_count() > 1:
+        #     model = torch.nn.DataParallel(model, device_ids = range(torch.cuda.device_count()))  
+        #     print('gpu device: ', list(range(torch.cuda.device_count())))
+        #     train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
+        # else:
+        #     train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
+        
         train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
     elif params.method == 'protonet':
         train(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
