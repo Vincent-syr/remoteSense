@@ -9,7 +9,7 @@ import numpy as np
 
 
 
-trlog_path = 'checkpoints/NWPU/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_5shot/trlog/20201118-003046'
+trlog_path = 'checkpoints/AIDS/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_5shot/trlog/20201119-231500'
 save_fig(trlog_path)
 
 
