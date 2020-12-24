@@ -24,7 +24,7 @@ def adjust_learning_rate(params, optimizer, epoch, init_lr):
     elif params.lr_anneal == 'pwc':
         for param_group in optimizer.param_groups:
             if epoch >=200 and epoch < 250:
-                param_gro+up['lr'] = init_lr*0.1
+                param_group['lr'] = init_lr*0.1
             elif epoch>=250:
                 param_group['lr'] = init_lr*0.01
             # elif epoch ==300:

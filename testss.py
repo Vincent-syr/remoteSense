@@ -8,8 +8,7 @@ import numpy as np
 # https://blog.csdn.net/TH_NUM/article/details/86105609
 
 
-
-trlog_path = 'checkpoints/AIDS/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_5shot/trlog/20201119-231500'
+trlog_path = 'checkpoints/WURS/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_1shot/trlog/20201223-022115'
 save_fig(trlog_path)
 
 

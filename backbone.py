@@ -323,6 +323,7 @@ class ConvNetSNopool(nn.Module): #Relation net use a 4 layer conv with pooling i
         out = self.trunk(out)
         return out
 
+# ResNet10,     return ResNet(SimpleBlock, [1,1,1,1],[64,128,256,512], flatten)
 class ResNet(nn.Module):
     maml = False #Default
     def __init__(self,block,list_of_num_layers, list_of_out_dims, flatten = True):
