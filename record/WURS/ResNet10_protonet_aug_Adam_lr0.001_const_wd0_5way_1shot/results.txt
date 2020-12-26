@@ -1,0 +1,2 @@
+Time: 20201226-222326, Setting: WURS-base-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 99.93% +- 0.05% 
+Time: 20201226-222335, Setting: WURS-val-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 68.43% +- 0.88% 

@@ -46,7 +46,7 @@ def evaluation(dataloader, model, split, trlog, params):
             else: # only image feature
                 z_all = data_from_modalities.cuda()
 
-            correct_this, count_this = model.module.correct_quick(z_all)
+            correct_this, count_this = model.correct_quick(z_all)
         
             acc = correct_this/float(count_this) * 100
             trlog['%s_acc' % split].append(acc)
@@ -61,17 +61,17 @@ def evaluation(dataloader, model, split, trlog, params):
             if params.aux:
                 
                 x[0] = x[0].cuda()   # shape(n_way*(n_shot+query), 3, 224,224)
-                x[1] = x[1].view(model.module.n_way, -1, x[1].shape[-1]).cuda()
+                x[1] = x[1].view(model.n_way, -1, x[1].shape[-1]).cuda()
                 x[1] = x[1].mean(1)   # (n_way, feat_dim)            
                 z_all, lambda_c, attr_proj = model.forward(x)
-                scores = model.module.compute_score(z_all, lambda_c, attr_proj)
+                scores = model.compute_score(z_all, lambda_c, attr_proj)
 
             else:
                 x = x.cuda()
                 z_all = model.forward(x)
-                scores = model.module.compute_score(z_all)
+                scores = model.compute_score(z_all)
 
-            correct_this, count_this = model.module.correct(scores)
+            correct_this, count_this = model.correct(scores)
             acc = correct_this/ float(count_this)*100
             trlog['%s_acc' % split].append(acc)
             acc_all.append(acc)
@@ -121,16 +121,11 @@ def get_dataloader(model, split, params):
 if __name__ == '__main__':
     params = parse_args('test')
     print(params)
-    # acc_all = []
     params.iter_num = 400
+    
     params.n_episode = params.iter_num
-    if params.dataset == 'CUB':
-        image_size = 224
-        word_dim = 312
+    image_size = 224
 
-    elif params.dataset == 'miniImagenet':
-        image_size = 84
-        word_dim = 300
 
     n_query = params.n_query
     
@@ -150,6 +145,10 @@ if __name__ == '__main__':
     model = model.eval()
 
     params.checkpoint_dir = 'checkpoints/%s/%s_%s' %(params.dataset, params.model, params.method)
+
+
+
+    
     if params.train_aug:
         params.checkpoint_dir += '_aug'
 
@@ -157,7 +156,6 @@ if __name__ == '__main__':
     
     if not params.method  in ['baseline', 'baseline++']: 
         params.checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
-
     params.model_dir = os.path.join(params.checkpoint_dir, 'model')
     params.record_dir = params.checkpoint_dir.replace("checkpoints", "record")
     if not os.path.isdir(params.record_dir):
@@ -175,8 +173,11 @@ if __name__ == '__main__':
         print('load model ')
 
 
-    model = torch.nn.DataParallel(model, device_ids = range(torch.cuda.device_count()))  
-    print('gpu device: ', list(range(torch.cuda.device_count())))
+    print("checkpoint_dir = ", params.checkpoint_dir)
+    print("record_dir = ", params.record_dir)
+
+    # model = torch.nn.DataParallel(model, device_ids = range(torch.cuda.device_count()))  
+    # print('gpu device: ', list(range(torch.cuda.device_count())))
 
     # loadfile = configs.data_dir[params.dataset] + 'novel.json'
     # split = params.split

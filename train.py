@@ -212,7 +212,7 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
 
             y_query = torch.from_numpy(np.repeat(range(model.n_way), 4*model.n_query))
             y_query = Variable(y_query.long().cuda())
-
+                
             rloss = lossfn(rotate_scores, a_)
             closs = model.loss_fn(scores, y_query)
 
@@ -255,7 +255,7 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
         with torch.no_grad():
             cacc_all = []
             racc_all = []
-            for i, (x, _) in enumerate(base_loader, 1):
+            for i, (x, _) in enumerate(val_loader, 1):
                 # shape(n_way*(n_shot+query), 3, 224,224)
                 # bs = x.size(0)   # n_way * (k_shot+query)
                 # x_ = []

@@ -42,7 +42,6 @@ class ProtoNetMulti(nn.Module):
         return z_support, z_query
 
 
-    # def correct(self, x, is_feature=False):
     def correct(self, scores):
         # scores.shape: (n_way * 4 query,  n_way)
         if self.params.method == 'rotate' and self.training:
@@ -109,11 +108,13 @@ class ProtoNetMulti(nn.Module):
     def compute_score(self, z_all):
         # z_all       = z_all.view(self.n_way, (self.n_support + self.n_query), -1)
         if self.params.method == 'rotate' and self.training:
+            # print("rotate training--------------------------------------------------------------")
             z_all       = z_all.view(self.n_way,  4*(self.n_support + self.n_query), -1)
             z_support   = z_all[:, :4 * self.n_support]
             z_query     = z_all[:, 4 * self.n_support:]
             # print("use rotation data")
         else:
+
             z_all       = z_all.view(self.n_way, (self.n_support + self.n_query), -1)
             z_support   = z_all[:, :self.n_support]
             z_query     = z_all[:, self.n_support:]

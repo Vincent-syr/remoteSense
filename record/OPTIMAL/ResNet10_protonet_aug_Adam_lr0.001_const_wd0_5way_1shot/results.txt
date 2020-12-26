@@ -1,0 +1,3 @@
+Time: 20201226-222351, Setting: OPTIMAL-base-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 99.74% +- 0.10% 
+Time: 20201226-222402, Setting: OPTIMAL-val-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 56.74% +- 1.11% 
+Time: 20201226-222412, Setting: OPTIMAL-novel-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 62.67% +- 1.10% 

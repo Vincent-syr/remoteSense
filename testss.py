@@ -2,13 +2,18 @@ import torch
 import matplotlib.pyplot as plt
 from io_utils import save_fig
 import numpy as np
-# from io_utils import model_dict, parse_args, get_resume_file, get_trlog
+import argparse
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--file'          , default='linux',        help='linux/windows')
+    return parser.parse_args()
 
 
 # https://blog.csdn.net/TH_NUM/article/details/86105609
 
-
-trlog_path = 'checkpoints/WURS/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_1shot/trlog/20201223-022115'
+params = parse_args()
+trlog_path = params.file
+# trlog_path = 'checkpoints/NWPU/ResNet10_rotate_aug_Adam_lr0.001_const_wd0_5way_1shot/trlog/20201224-070934'
 save_fig(trlog_path)
 
 

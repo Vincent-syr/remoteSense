@@ -1,0 +1,3 @@
+Time: 20201226-215724, Setting: NWPU-base-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 98.44% +- 0.21% 
+Time: 20201226-215859, Setting: NWPU-val-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 85.37% +- 0.65% 
+Time: 20201226-220035, Setting: NWPU-novel-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 72.80% +- 1.07% 

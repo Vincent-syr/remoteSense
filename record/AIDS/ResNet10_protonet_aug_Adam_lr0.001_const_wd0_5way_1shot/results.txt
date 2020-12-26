@@ -1,0 +1,3 @@
+Time: 20201226-222128, Setting: AIDS-base-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 95.64% +- 0.53% 
+Time: 20201226-222213, Setting: AIDS-val-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 77.65% +- 1.03% 
+Time: 20201226-222303, Setting: AIDS-novel-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 63.16% +- 1.07% 

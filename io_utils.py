@@ -134,23 +134,30 @@ def save_fig(trlog_path):
         train_loss = trlog['train_loss']
         train_acc = trlog['train_acc']
         val_acc = trlog['val_acc']
+        rotate_acc = trlog['train_racc']
+        rotate_loss = trlog['train_rloss']
+
         x = list(range(len(val_acc)))
 
         plt.figure()
         l1, = plt.plot(x, train_loss,linewidth = 1.0)
+        l2, = plt.plot(x, rotate_loss, linewidth = 1.0)
         plt.title('Train Loss')
         plt.xlabel('epoch')
         plt.ylabel('loss')
+        plt.legend(handles = [l1, l2], labels=['cls_loss', 'rotate_loss'],loc = 'best')
         plt.grid()
         plt.savefig('%s_loss.jpg' % trlog_path)
 
         plt.figure()
         l1, = plt.plot(x, train_acc, linewidth = 1.0)
         l2, = plt.plot(x, val_acc, linewidth = 1.0)
+        l3, = plt.plot(x, rotate_acc, linewidth = 1.0)
+
         plt.title('Accuracy')
         plt.xlabel('epoch')
         plt.ylabel('accuracy')
-        plt.legend(handles = [l1, l2], labels=['train_acc', 'val_acc'],loc = 'best')
+        plt.legend(handles = [l1, l2, l3], labels=['train_acc', 'val_acc', 'rotate_acc'],loc = 'best')
         plt.grid()
         plt.savefig('%s_acc.jpg' % trlog_path)
 

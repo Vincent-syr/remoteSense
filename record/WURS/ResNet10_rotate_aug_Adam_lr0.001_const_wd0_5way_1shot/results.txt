@@ -1,0 +1,2 @@
+Time: 20201226-214748, Setting: WURS-base-ResNet10-rotate-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 99.67% +- 0.15% 
+Time: 20201226-214756, Setting: WURS-val-ResNet10-rotate-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 69.12% +- 0.93% 
