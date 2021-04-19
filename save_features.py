@@ -6,7 +6,7 @@ import glob
 import h5py
 
 # import configs
-import backbone
+from methods import backbone, resnet12
 from data.datamgr import SimpleDataManager
 from io_utils import model_dict, parse_args, get_resume_file, get_best_file, get_assigned_file
 import warnings

@@ -1,3 +1,6 @@
 Time: 20201226-211905, Setting: OPTIMAL-base-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.96% +- 0.03% 
 Time: 20201226-211915, Setting: OPTIMAL-val-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 68.39% +- 0.97% 
 Time: 20201226-211925, Setting: OPTIMAL-novel-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 80.88% +- 0.71% 
+Time: 20201227-062300, Setting: OPTIMAL-base-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.76% +- 0.08% 
+Time: 20201227-062312, Setting: OPTIMAL-val-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 72.97% +- 0.86% 
+Time: 20201227-062325, Setting: OPTIMAL-novel-ResNet10-rotate-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 79.06% +- 0.73% 

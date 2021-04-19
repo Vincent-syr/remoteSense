@@ -8,7 +8,8 @@ import random
 
 
 # data_path = 'f:/shengyunrui/NWPU_Dataset/NWPU-RESISC45'
-data_path = '/test/0Dataset_others/Dataset/RemoteSense/AID/AID'
+# data_path = '/test/0Dataset_others/Dataset/RemoteSense/AID/AID'
+data_path = '/test2/0Dataset_others/Dataset/RemoteSense/AID/AID'
 # data_path = 'f:/shengyunrui/UCMerced_LandUse/UCMerced_LandUse/Images'
 savedir = './'
 

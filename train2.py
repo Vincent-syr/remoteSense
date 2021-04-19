@@ -9,7 +9,7 @@ import time
 import os
 import glob
 import copy
-import backbone
+from methods import backbone, resnet12
 from data.datamgr import SetDataManager
 from methods.protonet import ProtoNet
 from methods.protonet_multi_gpu import ProtoNetMulti

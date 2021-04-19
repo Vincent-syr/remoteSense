@@ -6,7 +6,7 @@ import json
 import random
 
 
-data_path = '/test/0Dataset_others/Dataset/RemoteSense/NWPU-RESISC45/NWPU-RESISC45'
+data_path = '/test2/0Dataset_others/Dataset/RemoteSense/NWPU-RESISC45/NWPU-RESISC45'
 # data_path = 'f:/shengyunrui/NWPU_Dataset/NWPU-RESISC45'
 savedir = './'
 dataset_list = ['base_linux','val_linux','novel_linux']

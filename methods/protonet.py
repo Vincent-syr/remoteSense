@@ -1,6 +1,6 @@
 # This code is modified from https://github.com/jakesnell/prototypical-networks 
 
-import backbone
+from methods import backbone, resnet12
 import torch
 import torch.nn as nn
 from torch.autograd import Variable

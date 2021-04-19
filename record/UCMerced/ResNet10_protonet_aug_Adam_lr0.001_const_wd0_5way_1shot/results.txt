@@ -1,3 +1,6 @@
 Time: 20201226-223654, Setting: UCMerced-base-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 99.35% +- 0.19% 
 Time: 20201226-223710, Setting: UCMerced-val-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 77.69% +- 0.85% 
 Time: 20201226-223727, Setting: UCMerced-novel-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 63.35% +- 0.86% 
+Time: 20201227-055004, Setting: UCMerced-base-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 99.37% +- 0.20% 
+Time: 20201227-055019, Setting: UCMerced-val-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 78.51% +- 0.88% 
+Time: 20201227-055034, Setting: UCMerced-novel-ResNet10-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 61.41% +- 0.87% 

@@ -1,3 +1,12 @@
 Time: 20201226-220438, Setting: OPTIMAL-base-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.26% +- 0.16% 
 Time: 20201226-220448, Setting: OPTIMAL-val-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 70.76% +- 1.00% 
 Time: 20201226-220459, Setting: OPTIMAL-novel-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 80.47% +- 0.78% 
+Time: 20201227-061723, Setting: OPTIMAL-base-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.36% +- 0.16% 
+Time: 20201227-061736, Setting: OPTIMAL-val-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 71.17% +- 0.93% 
+Time: 20201227-061749, Setting: OPTIMAL-novel-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 79.93% +- 0.76% 
+Time: 20201228-165139, Setting: OPTIMAL-base-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.40% +- 0.14% 
+Time: 20201228-165151, Setting: OPTIMAL-val-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 71.86% +- 0.93% 
+Time: 20201228-165203, Setting: OPTIMAL-novel-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 80.72% +- 0.74% 
+Time: 20201228-203656, Setting: OPTIMAL-base-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 99.33% +- 0.15% 
+Time: 20201228-203706, Setting: OPTIMAL-val-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 70.43% +- 0.99% 
+Time: 20201228-203717, Setting: OPTIMAL-novel-ResNet10-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 80.88% +- 0.75% 

@@ -436,6 +436,7 @@ class Res12Block(nn.Module):
 
 class ResNet12(nn.Module):
     """
+    my implementation of resnet12, following AM3
     total param: 32. it include 4 Res12Block, each Res12Block contains 8 params--4 weight and 4 bias
     """
     def __init__(self):
@@ -498,6 +499,12 @@ def Conv4SNP():
 
 def ResNet12_func():
     return ResNet12()
+
+
+
+
+
+
 
 
 def ResNet10(flatten = True):  # param: 32

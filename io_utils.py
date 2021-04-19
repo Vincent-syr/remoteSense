@@ -2,7 +2,7 @@ import numpy as np
 import os
 import glob
 import argparse
-import backbone
+from methods import backbone, resnet12
 import matplotlib.pyplot as plt
 import torch
 
@@ -10,7 +10,8 @@ model_dict = dict(
             Conv4 = backbone.Conv4,
             Conv4S = backbone.Conv4S,
             Conv6 = backbone.Conv6,
-            ResNet12 = backbone.ResNet12_func,
+            # ResNet12 = backbone.ResNet12_func,
+            ResNet12 = resnet12.resnet12, 
             ResNet10 = backbone.ResNet10,
             ResNet18 = backbone.ResNet18,
             ResNet34 = backbone.ResNet34,
@@ -22,15 +23,17 @@ def parse_args(script):
     # parser.add_argument('--dataset'     , default='CUB',        help='CUB/miniImagenet/cross/omniglot/cross_char')
     parser.add_argument('--os'          , default='linux',        help='linux/windows')
 
-    parser.add_argument('--dataset'     , default='CUB',        help='NPPU/WHU-RS19/UCMERCED')
-    parser.add_argument('--model'       , default='ResNet10',      help='model: Conv{4|6} / ResNet{10|18|34|50|101}') # 50 and 101 are not used in the paper
-    parser.add_argument('--method'      , default='protonet',   help='rotate/baseline/baseline++/protonet/matchingnet/relationnet{_softmax}/maml{_approx}') #relationnet_softmax replace L2 norm with softmax to expedite training, maml_approx use first-order approximation in the gradient for efficiency
+    parser.add_argument('--dataset'     , default='NWPU',        help='NPPU/WHU-RS19/UCMERCED')
+    parser.add_argument('--model'       , default='ResNet12',      help='model: Conv{4|6} / ResNet{10|18|34|50|101}') # 50 and 101 are not used in the paper
+    parser.add_argument('--method'      , default='cs_protonet',   help='rotate/baseline/baseline++/protonet/matchingnet/relationnet{_softmax}/maml{_approx}') #relationnet_softmax replace L2 norm with softmax to expedite training, maml_approx use first-order approximation in the gradient for efficiency
     parser.add_argument('--train_n_way' , default=5, type=int,  help='class num to classify for training') #baseline and baseline++ would ignore this parameter
     parser.add_argument('--test_n_way'  , default=5, type=int,  help='class num to classify for testing (validation) ') #baseline and baseline++ only use this parameter in finetuning
-    parser.add_argument('--n_shot'      , default=5, type=int,  help='number of labeled data in each class, same as n_support') #baseline and baseline++ only use this parameter in finetuning
+    parser.add_argument('--n_shot'      , default=1, type=int,  help='number of labeled data in each class, same as n_support') #baseline and baseline++ only use this parameter in finetuning
     parser.add_argument('--n_query'      , default=8, type=int,  help='number of unlabeled  query data in each class, same as n_query') #baseline and baseline++ only use this parameter in finetuning
 
-    parser.add_argument('--train_aug'   , default=True, help='perform data augmentation or not during training ') #still required for save_features.py and test.py to find the model path correctly
+    parser.add_argument('--train_aug'   , default=True, type=bool, help='perform data augmentation or not during training ') #still required for save_features.py and test.py to find the model path correctly
+    # parser.add_argument('--no_aug' ,dest='train_aug', action='store_false', default=True,  help='perform data augmentation or not during training ') 
+    
     parser.add_argument('--n_episode', default=100, type=int, help = 'num of episodes in each epoch')
     parser.add_argument('--mlp_dropout' , default=0.7, help='dropout rate in word embedding transformer')
     # parser.add_argument('--aux'   , default=False,  help='use attribute as auxiliary data, multimodal method')
@@ -84,6 +87,9 @@ def get_trlog(params):
         trlog['train_rloss'] = []
         trlog['train_racc'] = []
         trlog['val_racc'] = []
+    if params.method == 'cs_protonet':
+        trlog["train_cs_loss"] = []
+
     return trlog
 
 
@@ -131,33 +137,48 @@ def save_fig(trlog_path):
 
     if trlog['script'] == 'pre-train':
         print('max_acc = %.2f, max_acc_epoch = %d' % (trlog['max_acc'], trlog['max_acc_epoch']))
-        train_loss = trlog['train_loss']
+
         train_acc = trlog['train_acc']
         val_acc = trlog['val_acc']
-        rotate_acc = trlog['train_racc']
-        rotate_loss = trlog['train_rloss']
-
         x = list(range(len(val_acc)))
 
-        plt.figure()
-        l1, = plt.plot(x, train_loss,linewidth = 1.0)
-        l2, = plt.plot(x, rotate_loss, linewidth = 1.0)
-        plt.title('Train Loss')
-        plt.xlabel('epoch')
-        plt.ylabel('loss')
-        plt.legend(handles = [l1, l2], labels=['cls_loss', 'rotate_loss'],loc = 'best')
-        plt.grid()
-        plt.savefig('%s_loss.jpg' % trlog_path)
+        if trlog['args']['method'] == 'protonet':
+            train_loss = trlog['train_loss']
+            plt.figure()
+            l1, = plt.plot(x, train_loss,linewidth = 1.0)
+            plt.title('Train Loss')
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            # plt.legend(handles = [l1, l2], labels=['cls_loss', 'rotate_loss'],loc = 'best')
+            plt.legend(handles = [l1], labels=['cls_loss'],loc = 'best')
+            plt.grid()
+            plt.savefig('%s_loss.jpg' % trlog_path)
+
+
+        elif trlog['args']['method'] == 'cs_protonet':
+            train_clf_loss = trlog['train_loss']
+            train_cs_loss = trlog['train_cs_loss']
+            l1, = plt.plot(x, train_clf_loss,linewidth = 1.0)
+            l2, = plt.plot(x, train_cs_loss, linewidth = 1.0)
+
+            plt.title('Train Loss')
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.legend(handles = [l1, l2], labels=['cls_loss', 'cs_loss'],loc = 'best')
+            plt.grid()
+            plt.savefig('%s_loss.jpg' % trlog_path)
+
+
 
         plt.figure()
         l1, = plt.plot(x, train_acc, linewidth = 1.0)
         l2, = plt.plot(x, val_acc, linewidth = 1.0)
-        l3, = plt.plot(x, rotate_acc, linewidth = 1.0)
+        # l3, = plt.plot(x, rotate_acc, linewidth = 1.0)
 
         plt.title('Accuracy')
         plt.xlabel('epoch')
         plt.ylabel('accuracy')
-        plt.legend(handles = [l1, l2, l3], labels=['train_acc', 'val_acc', 'rotate_acc'],loc = 'best')
+        plt.legend(handles = [l1, l2], labels=['train_acc', 'val_acc'], loc = 'best')
         plt.grid()
         plt.savefig('%s_acc.jpg' % trlog_path)
 

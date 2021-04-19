@@ -98,13 +98,33 @@ python test_s1.py --method=protonet --dataset=UCMerced --n_shot=1
 python test_s1.py --method=protonet --dataset=WURS --n_shot=1
 python test_s1.py --method=protonet --dataset=OPTIMAL --n_shot=1
 
-
 # 22:00  hz_2
 python train.py --method=protonet --dataset=AIDS --n_shot=5 --stop_epoch=300
 python save_features.py --method=protonet --dataset=AIDS --n_shot=5
 python test_s1.py --method=protonet --dataset=AIDS --n_shot=5
 
-# 22:20  hz_3
-python train.py --method=rotate --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 --train_aug=False
-python save_features.py --method=protonet --dataset=OPTIMAL --n_shot=5 --train_aug=False
-python test_s1.py --method=protonet --dataset=OPTIMAL --n_shot=5  --train_aug=False
+# 12/27
+# 19:54  hz_3
+python train.py --method=rotate --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 --no_aug
+python save_features.py --method=rotate --dataset=OPTIMAL --n_shot=5 --no_aug
+python test_s1.py --method=rotate --dataset=OPTIMAL --n_shot=5  --no_aug
+
+# 20:00 hz_2
+python train.py --method=rotate --dataset=NWPU --n_shot=5 --stop_epoch=300 --no_aug
+python save_features.py --method=rotate --dataset=NWPU --n_shot=5 --no_aug
+python test_s1.py --method=rotate --dataset=NWPU --n_shot=5  --no_aug
+
+# 20:20
+python save_features.py --method=protonet --dataset=CUB --n_shot=5 --stop_epoch=300 
+python test_s1.py --method=protonet --dataset=CUB --n_shot=5 
+
+# 12/28
+# 10:20
+python train.py --method=rotate --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 --no_aug
+python save_features.py --method=rotate --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 
+python test_s1.py --method=totate --dataset=OPTIMAL --n_shot=5 
+
+#  1/11
+python train.py --method=protonet --dataset=CUB --n_shot=5 --stop_epoch=300
+python save_features.py --method=protonet --dataset=CUB --n_shot=5
+python test_s1.py --method=protonet --dataset=CUB --n_shot=5

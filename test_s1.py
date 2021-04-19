@@ -17,7 +17,7 @@ import random
 import time
 
 # import configs
-import backbone
+from methods import backbone, resnet12
 import data.feature_loader as feat_loader
 from data.dataloader_vae import DATA_LOADER
 from data.datamgr import SimpleDataManager, SetDataManager
@@ -125,12 +125,8 @@ if __name__ == '__main__':
     
     params.n_episode = params.iter_num
     image_size = 224
-
-
     n_query = params.n_query
     
-
-
     few_shot_params = dict(n_way = params.test_n_way , n_support = params.n_shot, n_query=params.n_query)   # 5 way, 5 shot
     if params.method == 'protonet' or params.method == 'rotate':
         params.aux = False
@@ -146,8 +142,6 @@ if __name__ == '__main__':
 
     params.checkpoint_dir = 'checkpoints/%s/%s_%s' %(params.dataset, params.model, params.method)
 
-
-
     
     if params.train_aug:
         params.checkpoint_dir += '_aug'
@@ -157,7 +151,9 @@ if __name__ == '__main__':
     if not params.method  in ['baseline', 'baseline++']: 
         params.checkpoint_dir += '_%dway_%dshot' %( params.train_n_way, params.n_shot)
     params.model_dir = os.path.join(params.checkpoint_dir, 'model')
-    params.record_dir = params.checkpoint_dir.replace("checkpoints", "record")
+    # params.record_dir = params.checkpoint_dir.replace("checkpoints", "record")
+    params.record_dir = os.path.join(params.checkpoint_dir, "trlog")
+
     if not os.path.isdir(params.record_dir):
         os.makedirs(params.record_dir)
 
@@ -172,15 +168,9 @@ if __name__ == '__main__':
         model.load_state_dict(tmp['state'])
         print('load model ')
 
-
     print("checkpoint_dir = ", params.checkpoint_dir)
     print("record_dir = ", params.record_dir)
 
-    # model = torch.nn.DataParallel(model, device_ids = range(torch.cuda.device_count()))  
-    # print('gpu device: ', list(range(torch.cuda.device_count())))
-
-    # loadfile = configs.data_dir[params.dataset] + 'novel.json'
-    # split = params.split
     split_list = ['base', 'val', 'novel']
 
 

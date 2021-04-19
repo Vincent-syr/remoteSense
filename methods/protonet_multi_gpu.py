@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
-from backbone import init_layer
+from methods.backbone import init_layer
 from utils import euclidean_dist
 
 
