@@ -102,8 +102,12 @@ class ProtoNetMulti(nn.Module):
 
         return z_all
 
-
-
+    def forward(self, x, target=None, mixup_hidden=True, lam=0.4):
+        """[summary] for manifold mixup
+            for protonet method, z is only z_query
+        """
+        z = self.feature.forward(x, target, mixup_hidden, lam )
+        return z
 
     def compute_score(self, z_all):
         # z_all       = z_all.view(self.n_way, (self.n_support + self.n_query), -1)

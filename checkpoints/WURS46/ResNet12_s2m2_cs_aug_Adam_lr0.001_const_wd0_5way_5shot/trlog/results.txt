@@ -1,0 +1,3 @@
+Time: 20210423-091336, Setting: WURS46-base-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 96.43% +- 0.42% 
+Time: 20210423-091925, Setting: WURS46-val-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 76.99% +- 0.80% 
+Time: 20210423-092405, Setting: WURS46-novel-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 78.62% +- 0.86% 

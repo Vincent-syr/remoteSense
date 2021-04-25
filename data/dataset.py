@@ -6,16 +6,18 @@ import json
 import numpy as np
 import torchvision.transforms as transforms
 import os
-
+# from PIL import ImageFile
+# ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 identity = lambda x:x
 class SimpleDataset:
-    def __init__(self, data_file, transform, params, target_transform=identity):
+    def __init__(self, data_file, transform, params, aug, target_transform=identity):
         with open(data_file, 'r') as f:
             self.meta = json.load(f)
         self.data = self.meta['image_names']
         self.label = self.meta['image_labels']
         self.params = params
+        self.aug = aug
         self.transform = transform
         self.target_transform = target_transform
 
@@ -24,7 +26,7 @@ class SimpleDataset:
         img = Image.open(image_path).convert('RGB')
         img1 = self.transform(img)
         target = self.target_transform(self.meta['image_labels'][i])
-        if self.params.method == "cs_protonet":
+        if ('cs' in self.params.method)and self.aug:
             img2 = self.transform(img)
             return (img1, img2), target    # aug for contrastive learning
         else:

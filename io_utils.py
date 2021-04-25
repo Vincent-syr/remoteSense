@@ -32,7 +32,7 @@ def parse_args(script):
     parser.add_argument('--n_query'      , default=8, type=int,  help='number of unlabeled  query data in each class, same as n_query') #baseline and baseline++ only use this parameter in finetuning
 
     parser.add_argument('--train_aug'   , default=True, type=bool, help='perform data augmentation or not during training ') #still required for save_features.py and test.py to find the model path correctly
-    # parser.add_argument('--no_aug' ,dest='train_aug', action='store_false', default=True,  help='perform data augmentation or not during training ') 
+    parser.add_argument('--no_aug' ,dest='train_aug', action='store_false', default=True,  help='perform data augmentation or not during training ') 
     
     parser.add_argument('--n_episode', default=100, type=int, help = 'num of episodes in each epoch')
     parser.add_argument('--mlp_dropout' , default=0.7, help='dropout rate in word embedding transformer')
@@ -52,7 +52,8 @@ def parse_args(script):
         parser.add_argument('--start_epoch' , default=0, type=int,help ='Starting epoch')
         parser.add_argument('--stop_epoch'  , default=300, type=int, help ='Stopping epoch') #for meta-learning methods, each epoch contains 100 episodes. The default epoch number is dataset dependent. See train.py
         parser.add_argument('--warmup'      , action='store_true', help='continue from baseline, neglected if resume is true') #never used in the paper
- 
+        parser.add_argument('--alpha'       , default=2.0, type=int, help='for manifold_mixup or S2M2 training ')
+    
     elif script == 'save_features':
         parser.add_argument('--split'       , default='novel', help='base/val/novel') #default novel, but you can also test base/val class accuracy if you want 
         parser.add_argument('--save_iter', default=-1, type=int,help ='save feature from the model trained in x epoch, use the best model if x is -1')
@@ -83,12 +84,14 @@ def get_trlog(params):
     trlog['val_acc'] = []
     trlog['max_acc'] = 0.0
     trlog['max_acc_epoch'] = 0
-    if params.method == 'rotate':
-        trlog['train_rloss'] = []
-        trlog['train_racc'] = []
-        trlog['val_racc'] = []
-    if params.method == 'cs_protonet':
-        trlog["train_cs_loss"] = []
+    trlog['train_mm_loss'] = []
+    # if params.method == 'rotate':
+    trlog['train_rloss'] = []
+    trlog['train_racc'] = []
+    trlog['val_racc'] = []
+    # if params.method == 'cs_protonet':
+    trlog["train_cs_loss"] = []
+    
 
     return trlog
 

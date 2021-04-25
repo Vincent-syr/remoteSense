@@ -75,15 +75,16 @@ class DataManager:
 
 
 class SimpleDataManager(DataManager):
-    def __init__(self, image_size, batch_size):        
+    def __init__(self, image_size, batch_size, params):        
         super(SimpleDataManager, self).__init__()
         self.batch_size = batch_size
         self.trans_loader = TransformLoader(image_size)
+        self.params = params
 
     def get_data_loader(self, data_file, aug): #parameters that would change on train/val set
         # transform = self.trans_loader.get_composed_transform(aug)
         transform = self.trans_loader.get_cs_transform(aug)
-        dataset = SimpleDataset(data_file, transform, self.params)
+        dataset = SimpleDataset(data_file, transform, self.params, aug=aug)
 
         data_loader_params = dict(batch_size = self.batch_size, shuffle = True, num_workers = 12, pin_memory = True)       
         data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
@@ -105,7 +106,7 @@ class SetDataManager(DataManager):
         # transform = self.trans_loader.get_composed_transform(aug)
         transform = self.trans_loader.get_cs_transform(aug)
 
-        dataset = SimpleDataset(data_file, transform, self.params)
+        dataset = SimpleDataset(data_file, transform, self.params, aug)
         sampler = EpisodicSampler(dataset.label, self.n_way, self.batch_size, self.n_episode)
         # data_loader_params = dict(batch_sampler = sampler,  num_workers = 12, pin_memory = True)       
         # data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)

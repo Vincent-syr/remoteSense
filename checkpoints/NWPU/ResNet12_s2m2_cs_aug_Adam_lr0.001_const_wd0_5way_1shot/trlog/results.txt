@@ -1,0 +1,7 @@
+Time: 20210421-030949, Setting: NWPU-base-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 96.26% +- 0.43% 
+Time: 20210421-031128, Setting: NWPU-val-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 75.82% +- 1.12% 
+Time: 20210421-031308, Setting: NWPU-novel-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 64.71% +- 1.19% 
+
+Time: 20210421-085509, Setting: NWPU-base-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 92.72% +- 0.77% 
+Time: 20210421-085651, Setting: NWPU-val-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 64.13% +- 1.17% 
+Time: 20210421-085833, Setting: NWPU-novel-ResNet12-s2m2_cs-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 68.64% +- 1.11% 

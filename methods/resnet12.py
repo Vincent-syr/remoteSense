@@ -3,6 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import nn as nn
 from torch.distributions import Bernoulli
+
+import random
+
 """
 
 following the paper "# Learning-a-Few-shot-Embedding-Model-with-Contrastive-Learning"
@@ -120,6 +123,21 @@ class BasicBlock(nn.Module):
         return out
 
 
+
+def mixup_data(x, y, lam):
+
+    '''Compute the mixup data. Return mixed inputs, pairs of targets, and lambda'''
+   
+    batch_size = x.size()[0]
+    index = torch.randperm(batch_size)  # 0~batch_size打乱顺序
+    if torch.cuda.is_available():
+        index = index.cuda()
+    mixed_x = lam * x + (1 - lam) * x[index,:]
+    y_a, y_b = y, y[index]
+
+    return mixed_x, y_a, y_b, lam
+
+
 class ResNet(nn.Module):
 
     def __init__(self, pretrain=False,meta_test=False,drop_block=False, drop_rate=0.1, dropblock_size=5):
@@ -158,24 +176,64 @@ class ResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x,return_feat=False, return_both=False, return_map=False):
-        x1 = self.layer1(x)
-        x2 = self.layer2(x1)
-        x3 = self.layer3(x2)
-        x4 = self.layer4(x3) 
-        # if self.meta_test:
-        #     x = self.avgpool(x4)
-        #     x = x.view(x.size(0), -1)
-        #     return x
-        # if self.pretrain:
-        #     x = self.avgpool(x4)
-        #     x = x.view(x.size(0), -1)
-        #     result = self.fc(x)
-        #     return result
 
-        x = self.avgpool(x4)
-        x = x.view(x.size(0), -1)
-        return x
+
+
+
+    def forward(self, x, target=None, mixup=False, mixup_hidden=True,  lam=0.4):
+        # write manifold mix up following S2M2
+        if target is not None:
+            if mixup_hidden:
+                layer_mix = random.randint(0,4)  # 0~4随机生成一个数
+            elif mixup:
+                layer_mix = 0
+            
+            out = x
+            target_a = target_b  = target
+
+            if layer_mix == 0:
+                out, target_a , target_b , lam = mixup_data(out, target, lam=lam)
+            out = self.layer1(out)
+
+            if layer_mix == 1:
+                out, target_a , target_b , lam  = mixup_data(out, target, lam=lam)
+            out = self.layer2(out)
+
+            if layer_mix == 2:
+                out, target_a , target_b , lam  = mixup_data(out, target, lam=lam)
+            out = self.layer3(out)
+            
+            if layer_mix == 3:
+                out, target_a , target_b , lam  = mixup_data(out, target, lam=lam)
+            out = self.layer4(out)
+
+            if layer_mix == 4:
+                out, target_a , target_b , lam  = mixup_data(out, target, lam=lam)
+
+            out = self.avgpool(out)
+            out = out.view(out.size(0), -1)
+            return out, target_a, target_b
+
+        # normal resnet12
+        else:
+            x1 = self.layer1(x)
+            x2 = self.layer2(x1)
+            x3 = self.layer3(x2)
+            x4 = self.layer4(x3) 
+
+            # if self.meta_test:
+            #     x = self.avgpool(x4)
+            #     x = x.view(x.size(0), -1)
+            #     return x
+            # if self.pretrain:
+            #     x = self.avgpool(x4)
+            #     x = x.view(x.size(0), -1)
+            #     result = self.fc(x)
+            #     return result
+
+            x = self.avgpool(x4)
+            x = x.view(x.size(0), -1)
+            return x
         
 
 def resnet12():

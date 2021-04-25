@@ -39,20 +39,20 @@ def save_features(model, data_loader, outfile):
     
     f.close()
 
-
+    
 if __name__ == '__main__':
     params = parse_args('save_features')
     print(params)
 
-    image_size = 224
+    image_size = 84
     # if params.dataset == 'CUB':
     #     image_size = 224
     # elif params.dataset == 'miniImagenet':
     #     image_size = 84
     print('image_size = ', image_size)
-    base_file = os.path.join('./filelists', params.dataset, 'base.json')
-    val_file = os.path.join('./filelists', params.dataset, 'val.json')
-    novel_file = os.path.join('./filelists', params.dataset, 'novel.json')
+    base_file = os.path.join('./filelists', params.dataset, 'base_linux.json')
+    val_file = os.path.join('./filelists', params.dataset, 'val_linux.json')
+    novel_file = os.path.join('./filelists', params.dataset, 'novel_linux.json')
     # loadfile_list = [configs.data_dir[params.dataset] + 'base.json', configs.data_dir[params.dataset] + 'val.json', configs.data_dir[params.dataset] + 'novel.json']
     loadfile_list = [base_file, val_file, novel_file]
     split_list = ['base', 'val', 'novel']
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         
         outfile = os.path.join(params.checkpoint_dir.replace("checkpoints","features"), split_list[i] + '_best' + ".hdf5")  # './features/miniImagenet/Conv4_baseline_aug/novel.hdf5'
         print('outfile = ', outfile)
-        datamgr         = SimpleDataManager(image_size, batch_size = 64)
+        datamgr         = SimpleDataManager(image_size, batch_size = 64, params=params)
 
         data_loader      = datamgr.get_data_loader(loadfile, aug = False)
 

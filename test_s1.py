@@ -56,25 +56,25 @@ def evaluation(dataloader, model, split, trlog, params):
                 
                 # trlog['%s_acc' % split].append(acc)
 
-    elif params.source == 'image':
-        for x,_ in dataloader:
-            if params.aux:
+    # elif params.source == 'image':
+    #     for x,_ in dataloader:
+    #         if params.aux:
                 
-                x[0] = x[0].cuda()   # shape(n_way*(n_shot+query), 3, 224,224)
-                x[1] = x[1].view(model.n_way, -1, x[1].shape[-1]).cuda()
-                x[1] = x[1].mean(1)   # (n_way, feat_dim)            
-                z_all, lambda_c, attr_proj = model.forward(x)
-                scores = model.compute_score(z_all, lambda_c, attr_proj)
+    #             x[0] = x[0].cuda()   # shape(n_way*(n_shot+query), 3, 224,224)
+    #             x[1] = x[1].view(model.n_way, -1, x[1].shape[-1]).cuda()
+    #             x[1] = x[1].mean(1)   # (n_way, feat_dim)            
+    #             z_all, lambda_c, attr_proj = model.forward(x)
+    #             scores = model.compute_score(z_all, lambda_c, attr_proj)
 
-            else:
-                x = x.cuda()
-                z_all = model.forward(x)
-                scores = model.compute_score(z_all)
+    #         else:
+    #             x = x.cuda()
+    #             z_all = model.forward(x)
+    #             scores = model.compute_score(z_all)
 
-            correct_this, count_this = model.correct(scores)
-            acc = correct_this/ float(count_this)*100
-            trlog['%s_acc' % split].append(acc)
-            acc_all.append(acc)
+    #         correct_this, count_this = model.correct(scores)
+    #         acc = correct_this/ float(count_this)*100
+    #         trlog['%s_acc' % split].append(acc)
+    #         acc_all.append(acc)
 
     else:
         raise ValueError("unknown data source")
@@ -100,17 +100,17 @@ def get_dataloader(model, split, params):
     #  dataset, data_file, attr_file, n_way, k_shot,aux_datasource='attributes'
 
 
-    elif params.source == 'image':
-    #         base_datamgr            = SetDataManager(image_size, aux=aux, n_episode=params.n_episode, **train_few_shot_params)
-    # base_loader             = base_datamgr.get_data_loader( base_file , aug = params.train_aug )
-        few_shot_params   = dict(n_way = params.train_n_way, n_support = params.n_shot, n_query=params.n_query) 
-        data_file = configs.data_dir[params.dataset] + '%s.json' % (split) 
+    # elif params.source == 'image':
+    # #         base_datamgr            = SetDataManager(image_size, aux=aux, n_episode=params.n_episode, **train_few_shot_params)
+    # # base_loader             = base_datamgr.get_data_loader( base_file , aug = params.train_aug )
+    #     few_shot_params   = dict(n_way = params.train_n_way, n_support = params.n_shot, n_query=params.n_query) 
+    #     data_file = configs.data_dir[params.dataset] + '%s.json' % (split) 
 
-        if params.aux:
-            attr_file = configs.data_dir[params.dataset] + 'attr_array.npy'
-            data_file = [data_file, attr_file]
-        datamgr      = SetDataManager(image_size, aux=params.aux, n_episode=params.n_episode, **few_shot_params)
-        dataloader  = datamgr.get_data_loader(data_file , aug = False)
+    #     if params.aux:
+    #         attr_file = configs.data_dir[params.dataset] + 'attr_array.npy'
+    #         data_file = [data_file, attr_file]
+    #     datamgr      = SetDataManager(image_size, aux=params.aux, n_episode=params.n_episode, **few_shot_params)
+    #     dataloader  = datamgr.get_data_loader(data_file , aug = False)
     
     else:
         raise ValueError("unknown data source")
@@ -128,12 +128,9 @@ if __name__ == '__main__':
     n_query = params.n_query
     
     few_shot_params = dict(n_way = params.test_n_way , n_support = params.n_shot, n_query=params.n_query)   # 5 way, 5 shot
-    if params.method == 'protonet' or params.method == 'rotate':
+    if params.method == 'protonet' or params.method == 'rotate' or params.method == "s2m2_cs" or params.method == 'cs_protonet':
         params.aux = False
         model = ProtoNetMulti(model_dict[params.model], params=params, **few_shot_params)
-    elif params.method == 'am3':
-        params.aux = True
-        model = AM3(model_dict[params.model], params=params, word_dim=word_dim,  **few_shot_params)
     else:
         raise ValueError('Unknown method')
     
@@ -142,7 +139,6 @@ if __name__ == '__main__':
 
     params.checkpoint_dir = 'checkpoints/%s/%s_%s' %(params.dataset, params.model, params.method)
 
-    
     if params.train_aug:
         params.checkpoint_dir += '_aug'
 
