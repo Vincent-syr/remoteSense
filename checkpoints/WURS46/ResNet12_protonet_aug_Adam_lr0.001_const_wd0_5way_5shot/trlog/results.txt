@@ -1,2 +1,3 @@
 Time: 20210425-032705, Setting: WURS46-base-ResNet12-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 96.12% +- 0.42% 
 Time: 20210425-033231, Setting: WURS46-val-ResNet12-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 77.01% +- 0.83% 
+Time: 20210425-033657, Setting: WURS46-novel-ResNet12-protonet-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 77.10% +- 0.97% 

@@ -51,11 +51,8 @@ def compute_acc(scores, y):
 def train(base_loader, val_loader, model, start_epoch, stop_epoch, params, max_acc=0):
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
-    
+    trlog_path = params.trlog_path
+
     init_lr = params.init_lr
     if params.optim == 'SGD':
         optimizer = torch.optim.SGD(model.parameters(), lr=init_lr, momentum=0.9, weight_decay=0.001)
@@ -143,9 +140,7 @@ def train(base_loader, val_loader, model, start_epoch, stop_epoch, params, max_a
             outfile = os.path.join(params.model_dir, '{:d}.tar'.format(epoch))
             torch.save({'epoch':epoch, 'state':model.state_dict(), 'max_acc': trlog['max_acc']}, outfile)
             torch.save(trlog, trlog_path)
-            # draw trlog_fig
-            fig_command = "python testss.py --file=%s" % (trlog_path)
-            os.system(fig_command)
+
             
         torch.cuda.empty_cache()  
         # best epoch and val acc
@@ -162,11 +157,8 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
     
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
-    
+    trlog_path = params.trlog_path
+
     rotate_classifier = nn.Sequential(nn.Linear(model.feat_dim, 4)) 
     rotate_classifier.cuda()
 
@@ -324,7 +316,7 @@ def train_aug(base_loader, val_loader,  model, start_epoch, stop_epoch, params, 
     if not os.path.isdir(trlog_dir):
         os.makedirs(trlog_dir)
     trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
-    
+    rotate_classifier = nn.Sequential(nn.Linear(model.module.feat_dim, 4)) 
     init_lr = params.init_lr
     if params.optim == 'SGD':
         # optimizer = torch.optim.SGD(model.parameters(), lr=init_lr, momentum=0.9, weight_decay=0.001)
@@ -382,11 +374,8 @@ def train_aug(base_loader, val_loader,  model, start_epoch, stop_epoch, params, 
 def train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
-    
+    trlog_path = params.trlog_path
+
     rotate_classifier = nn.Sequential(nn.Linear(model.module.feat_dim, 4)) 
     rotate_classifier.cuda()
 
@@ -560,10 +549,8 @@ def train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epo
 def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
+    trlog_path = params.trlog_path
+
     cs_mlp = nn.Sequential(
         nn.Linear(model.feat_dim, model.feat_dim),
         nn.ReLU(), 
@@ -677,6 +664,8 @@ def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, 
             outfile = os.path.join(params.model_dir, '{:d}.tar'.format(epoch))
             torch.save({'epoch':epoch, 'state':model.state_dict(), 'max_acc': trlog['max_acc']}, outfile)
             torch.save(trlog, trlog_path)
+    
+
 
         torch.cuda.empty_cache()  
         # best epoch and val acc
@@ -690,10 +679,8 @@ def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, 
 def train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
+    trlog_path = params.trlog_path
+
     cs_mlp = nn.Sequential(
         nn.Linear(model.feat_dim, model.feat_dim),
         nn.ReLU(), 
@@ -908,6 +895,12 @@ if __name__ == "__main__":
     if not os.path.isdir(params.model_dir):
         os.makedirs(params.model_dir)
     print('checkpoint_dir = ', params.checkpoint_dir)
+
+    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
+    if not os.path.isdir(trlog_dir):
+        os.makedirs(trlog_dir)
+    params.trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
+    
     # print(params.train_aug)
     # exit(0)
     start_epoch = params.start_epoch
@@ -945,6 +938,9 @@ if __name__ == "__main__":
     elif params.method == 's2m2_cs':
         train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
 
+    # draw picture
+    fig_command = "python testss.py --file=%s" % (params.trlog_path)
+    os.system(fig_command)
 
     # after training, save feature and test
     save_command = "python save_features.py --method=%s --dataset=%s --n_shot=%d" % (params.method, params.dataset, params.n_shot)
