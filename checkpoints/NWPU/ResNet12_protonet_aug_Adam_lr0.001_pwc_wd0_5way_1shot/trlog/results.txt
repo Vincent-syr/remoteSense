@@ -1,0 +1,5 @@
+Time: 20210426-034611, Setting: NWPU-base-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 94.64% +- 0.55% 
+Time: 20210426-034826, Setting: NWPU-val-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 62.77% +- 1.25% 
+Time: 20210426-035046, Setting: NWPU-novel-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 70.47% +- 1.10% Time: 20210426-051253, Setting: NWPU-base-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 97.47% +- 0.33% 
+Time: 20210426-051433, Setting: NWPU-val-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 62.35% +- 1.21% 
+Time: 20210426-051629, Setting: NWPU-novel-ResNet12-protonet-aug 1shot 5way_train 5way_test, Acc: 400 Test Acc = 71.93% +- 1.12% 

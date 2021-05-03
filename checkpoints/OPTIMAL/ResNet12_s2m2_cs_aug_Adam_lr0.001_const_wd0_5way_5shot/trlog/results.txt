@@ -1,0 +1,3 @@
+Time: 20210427-073241, Setting: OPTIMAL-base-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 100.00% +- 0.00% 
+Time: 20210427-073252, Setting: OPTIMAL-val-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 74.19% +- 0.90% 
+Time: 20210427-073303, Setting: OPTIMAL-novel-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 76.94% +- 0.82% 

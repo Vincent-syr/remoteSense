@@ -89,3 +89,56 @@ python save_features.py --method=cs_protonet --dataset=WURS46 --n_shot=5
 python test_s1.py --method=cs_protonet --dataset=WURS46 --n_shot=5
 # 23:49 hz1 tmux1-2
 CUDA_VISIBLE_DEVICES=1 python train.py --method=s2m2_cs --dataset=WURS46 --n_shot=1 --stop_epoch=500 
+
+
+# 4/25
+# 18:41 
+CUDA_VISIBLE_DEVICES=0 python train.py --method=protonet --dataset=WURS46 --n_shot=1 --start_epoch=480 --stop_epoch=500 --trlog_file=20210423-072209
+
+# 4/26
+# 9:00 hz1 tmux1-0
+CUDA_VISIBLE_DEVICES=1 python train.py --method=s2m2_cs --dataset=UCMerced --n_shot=5 --stop_epoch=300 
+# 9:30 hz1 tmux 1-2
+CUDA_VISIBLE_DEVICES=0 python train.py --method=cs_protonet --dataset=UCMerced --n_shot=5 --stop_epoch=300 
+# 9:30  czy1 tmux 3-0
+CUDA_VISIBLE_DEVICES=0 python train.py --method=protonet --dataset=UCMerced --n_shot=5 --stop_epoch=300 
+
+# 9:40  czy1 tmux 3-1
+CUDA_VISIBLE_DEVICES=0 python train.py --method=s2m2_cs --dataset=NWPU --n_shot=1 --stop_epoch=500 --lr_anneal=pwc
+# 9:40  czy1 tmux 3-2
+CUDA_VISIBLE_DEVICES=1 python train.py --method=cs_protonet --dataset=NWPU --n_shot=1 --stop_epoch=500 --lr_anneal=pwc
+# 9:40  czy1 tmux 3-3
+CUDA_VISIBLE_DEVICES=1 python train.py --method=protonet --dataset=NWPU --n_shot=1 --stop_epoch=500 --lr_anneal=pwc
+# 16:51
+python save_features.py --method=s2m2_cs --dataset=NWPU --n_shot=1 --lr_anneal=pwc
+python test_s1.py --method=s2m2_cs --dataset=NWPU --n_shot=1 --lr_anneal=pwc
+
+
+# 17:15 hz1 tmux1-0
+CUDA_VISIBLE_DEVICES=0 python train.py --method=s2m2_cs --dataset=AIDS --n_shot=5 --stop_epoch=300 
+# 17:15 hz1 tmux 1-3
+CUDA_VISIBLE_DEVICES=1 python train.py --method=cs_protonet --dataset=AIDS --n_shot=5 --stop_epoch=300 
+# 17:15  czy1 tmux 3-0
+CUDA_VISIBLE_DEVICES=0 python train.py --method=protonet --dataset=AIDS --n_shot=5 --stop_epoch=300 
+# 17:15  czy1 tmux 3-1
+CUDA_VISIBLE_DEVICES=0 python train.py --method=s2m2_cs --dataset=UCMerced --n_shot=1 --stop_epoch=400
+# 17:15  czy1 tmux 3-2
+CUDA_VISIBLE_DEVICES=1 python train.py --method=cs_protonet --dataset=UCMerced --n_shot=1 --stop_epoch=400
+# 17:15  czy1 tmux 3-3
+CUDA_VISIBLE_DEVICES=1 python train.py --method=protonet --dataset=UCMerced --n_shot=1 --stop_epoch=400
+
+# 4/27
+# 15:30 czy1 tmux 3-1
+CUDA_VISIBLE_DEVICES=0 python train.py --method=s2m2_cs --dataset=AIDS --n_shot=1 --stop_epoch=400
+# 15:30  czy1 tmux 3-2
+CUDA_VISIBLE_DEVICES=1 python train.py --method=cs_protonet --dataset=AIDS --n_shot=1 --stop_epoch=400
+# 15:30 czy1 tmux 3-3
+CUDA_VISIBLE_DEVICES=1 python train.py --method=protonet --dataset=AIDS --n_shot=1 --stop_epoch=400
+
+
+# 17:15 hz1 tmux1-0
+CUDA_VISIBLE_DEVICES=0 python train.py --method=s2m2_cs --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 
+# 17:15 hz1 tmux 1-3
+CUDA_VISIBLE_DEVICES=1 python train.py --method=cs_protonet --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 
+# 17:15  czy1 tmux 3-0
+CUDA_VISIBLE_DEVICES=0 python train.py --method=protonet --dataset=OPTIMAL --n_shot=5 --stop_epoch=300 

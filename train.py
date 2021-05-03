@@ -30,15 +30,17 @@ def adjust_learning_rate(params, optimizer, epoch, init_lr):
         pass
     elif params.lr_anneal == 'pwc':
         for param_group in optimizer.param_groups:
-            if epoch >=200 and epoch < 250:
+            if epoch >=300:
                 param_group['lr'] = init_lr*0.1
-            elif epoch>=250:
-                param_group['lr'] = init_lr*0.01
+            # elif epoch>=250:
+            #     param_group['lr'] = init_lr*0.01
             # elif epoch ==300:
             #     param_group['lr'] = init_lr*0.001
     
     elif params.lr_anneal == 'exp':
         pass
+    else:
+        raise ValueError('No such lr anneal')
 
 
 def compute_acc(scores, y):
@@ -48,9 +50,7 @@ def compute_acc(scores, y):
     return correct, count
 
 
-def train(base_loader, val_loader, model, start_epoch, stop_epoch, params, max_acc=0):
-    trlog = get_trlog(params)
-    trlog['max_acc'] = max_acc
+def train(base_loader, val_loader, model, start_epoch, stop_epoch, params, trlog):
     trlog_path = params.trlog_path
 
     init_lr = params.init_lr
@@ -157,8 +157,9 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
     
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_path = params.trlog_path
 
+
+    trlog_path = params.trlog_path
     rotate_classifier = nn.Sequential(nn.Linear(model.feat_dim, 4)) 
     rotate_classifier.cuda()
 
@@ -312,10 +313,9 @@ def train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, par
 def train_aug(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
     trlog = get_trlog(params)
     trlog['max_acc'] = max_acc
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
+
+    trlog_path = params.trlog_path
+
     rotate_classifier = nn.Sequential(nn.Linear(model.module.feat_dim, 4)) 
     init_lr = params.init_lr
     if params.optim == 'SGD':
@@ -546,9 +546,7 @@ def train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epo
         print('ETA:{}/{}'.format(timer.measure(), timer.measure((epoch+1-start_epoch) / float(stop_epoch-start_epoch))))
 
 
-def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
-    trlog = get_trlog(params)
-    trlog['max_acc'] = max_acc
+def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog):
     trlog_path = params.trlog_path
 
     cs_mlp = nn.Sequential(
@@ -665,8 +663,6 @@ def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, 
             torch.save({'epoch':epoch, 'state':model.state_dict(), 'max_acc': trlog['max_acc']}, outfile)
             torch.save(trlog, trlog_path)
     
-
-
         torch.cuda.empty_cache()  
         # best epoch and val acc
         print('best epoch = %d, best val acc = %.2f%%' % (int(trlog['max_acc_epoch']), trlog['max_acc']))
@@ -676,9 +672,8 @@ def train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, 
 
 
 
-def train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc):
-    trlog = get_trlog(params)
-    trlog['max_acc'] = max_acc
+def train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog):
+
     trlog_path = params.trlog_path
 
     cs_mlp = nn.Sequential(
@@ -840,6 +835,15 @@ def train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, para
         print('ETA:{}/{}'.format(timer.measure(), timer.measure((epoch+1-start_epoch) / float(stop_epoch-start_epoch))))
 
 
+def train_s2m2_sc(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog):
+    # protonet + supervised contrastive loss + mixup loss
+
+    pass
+
+def train_baseline(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog):
+    
+    
+    pass
 
 
 
@@ -895,11 +899,6 @@ if __name__ == "__main__":
     if not os.path.isdir(params.model_dir):
         os.makedirs(params.model_dir)
     print('checkpoint_dir = ', params.checkpoint_dir)
-
-    trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
-    if not os.path.isdir(trlog_dir):
-        os.makedirs(trlog_dir)
-    params.trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
     
     # print(params.train_aug)
     # exit(0)
@@ -915,38 +914,55 @@ if __name__ == "__main__":
             if 'max_acc' in tmp:
                 max_acc = tmp['max_acc']
             model.load_state_dict(tmp['state'])
+            # trlog load
+            old_trlog_path = os.path.join(params.checkpoint_dir, 'trlog', params.trlog_file)
+            trlog = torch.load(old_trlog_path)      # 只截取当前0~start epoch
+            trlog['args'] = vars(params)
+            params.trlog_path = os.path.join(params.checkpoint_dir, 'trlog', time.strftime("%Y%m%d-%H%M%S", time.localtime()))
+            for key, val in trlog.items():
+                if type(val) == type([]) and len(val) > 0:
+                    print(key)
+                    val = val[:start_epoch]
+                    trlog[key] = val
             print('resume training from ', params.start_epoch)
         else:
             raise ValueError("no such resume file")
+    
+    # training from scratch
+    else:
+        trlog = get_trlog(params)
+        trlog['max_acc'] = max_acc
+        trlog_dir = os.path.join(params.checkpoint_dir, 'trlog')
+        if not os.path.isdir(trlog_dir):
+            os.makedirs(trlog_dir)
+        params.trlog_path = os.path.join(trlog_dir, time.strftime("%Y%m%d-%H%M%S", time.localtime()))   # '20200909-185444'
 
 
 
     if params.method == 'rotate':
-        # if torch.cuda.device_count() > 1:
-        #     model = torch.nn.DataParallel(model, device_ids = range(torch.cuda.device_count()))  
-        #     print('gpu device: ', list(range(torch.cuda.device_count())))
-        #     train_totate_multiGPU(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
-        # else:
-        #     train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
-        
-        train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
+        train_rotation(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog)
     elif params.method == 'protonet':
-        train(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
+        train(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog)
     elif params.method == "cs_protonet":
-        train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
-
+        train_contrastive(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog)
     elif params.method == 's2m2_cs':
-        train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, max_acc)
-
+        train_s2m2_cs(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog)
+    elif params.method == "baseline":
+        train_baseline(base_loader, val_loader,  model, start_epoch, stop_epoch, params, trlog)
+    else:
+        raise ValueError("no such method")
+        
     # draw picture
     fig_command = "python testss.py --file=%s" % (params.trlog_path)
     os.system(fig_command)
 
     # after training, save feature and test
-    save_command = "python save_features.py --method=%s --dataset=%s --n_shot=%d" % (params.method, params.dataset, params.n_shot)
-    test_command = "python test_s1.py --method=%s --dataset=%s --n_shot=%d" % (params.method, params.dataset, params.n_shot)
-    # print(save_command) 
-    # print(test_command)
+    save_command = "python save_features.py --method=%s --dataset=%s --n_shot=%d --lr_anneal=%s --optim=%s" % (
+                                        params.method, params.dataset, params.n_shot, params.lr_anneal, params.optim)
+    test_command = "python test_s1.py --method=%s --dataset=%s --n_shot=%d --lr_anneal=%s --optim=%s" % (
+                                        params.method, params.dataset, params.n_shot, params.lr_anneal, params.optim)
+    # print(save_command)   
+    # print(test_command)   
     os.system(save_command)
     os.system(test_command)
 

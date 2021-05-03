@@ -1,0 +1,3 @@
+Time: 20210426-014235, Setting: UCMerced-base-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 100.00% +- 0.00% 
+Time: 20210426-014251, Setting: UCMerced-val-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 93.88% +- 0.40% 
+Time: 20210426-014307, Setting: UCMerced-novel-ResNet12-s2m2_cs-aug 5shot 5way_train 5way_test, Acc: 400 Test Acc = 90.16% +- 0.47% 
