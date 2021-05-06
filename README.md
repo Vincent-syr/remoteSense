@@ -12,4 +12,4 @@ test:
 python test_s1.py --method=s2m2_cs --dataset=NWPU --n_shot=5
 
 指定device：
-CUDA_VISIBLE_DEVICES=0 python train.py
+CUDA_VISIBLE_DEVICES=0 python train.p --dataset=WURS46 --n_shot=5
